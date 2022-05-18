@@ -1,0 +1,21 @@
+name: Notion 2 Issue
+description: This action creates GitHub issues depends on a notion database
+inputs:
+  notionToken:
+    description: 'Your Notion API Token'
+    required: true
+  notionDatabase:
+    description: 'The Notion database id'
+    required: true
+  githubToken:
+    description: 'Your GitHub personal access token'
+    required: false
+    default: ${{ github.token }}
+
+runs:
+  using: docker
+  image: 'Dockerfile'
+
+branding: 
+  icon: refresh-ccw
+  color: purple

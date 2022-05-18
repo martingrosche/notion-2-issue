@@ -1,0 +1,23 @@
+name: Notion Database
+on: 
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+permissions:
+  contents: read
+  repository-projects: read
+  issues: write
+jobs:
+  sync-github-issues:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Run Action
+        uses: ./
+        # pass user input as arguments
+        with:
+          notionToken: ${{ secrets.NOTION_TOKEN }}
+          notionDatabase: ${{ secrets.NOTION_DATABASE }}
