@@ -10,19 +10,23 @@ categories:
     label: 'enhancement'
   - title: '📄 Documentation'
     label: 'documentation'
+
 change-template: '- $TITLE @$AUTHOR (#$NUMBER)'
-change-title-escapes: '\<*_&' # You can add # and @ to disable mentions, and add ` to disable code blocks.
+change-title-escapes: '\<*_&'
+
 version-resolver:
   major:
     labels:
-      - 'major'
+      - 'release'
   minor:
     labels:
-      - 'minor'
+      - 'feature request'
+      - 'documentation'
+      - 'enhancement'
   patch:
     labels:
-      - 'patch'
-  default: patch
+      - 'bug'
+  default: minor
 
 template: |
   ## Changes
