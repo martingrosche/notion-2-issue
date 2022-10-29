@@ -19,7 +19,7 @@ This GitHub action creates GitHub issues depending on a notion database.
 ## Usage
 
 1. Create a [new internal Notion integration](https://www.notion.so/my-integrations), give it a name (e.g. `github`) and note the value of the Internal Integration Token for further usage.
-2. Connect Notion Database to the name of the Integration Token. Open your Database -> `Share` -> `Invite` -> `Select an integration` (e.g. `github`) -> `Invite`.
+2. Connect Notion Database to the name of the Integration Token. Open your Database -> `...` -> `Add Connection` (e.g. `github`).
 3. Note the `Database ID`.
    > `https://www.notion.so/<long_hash_1>?v=<long_hash_2>`
 
