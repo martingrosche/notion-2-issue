@@ -39,3 +39,6 @@ autolabeler:
   - label: 'feature request'
     body:
       - '/Resolves #[0-9]*/'
+  - label: 'enhancement'
+    body:
+      - '/Closes #[0-9]*/'
