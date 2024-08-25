@@ -1,5 +1,5 @@
 name: PyTest
-on: 
+on:
   pull_request:
   push:
     branches:
@@ -10,9 +10,16 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v2
-      - name: fast-pytest
-        uses: fylein/python-pytest-github-action@v2
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v5
         with:
-          args: pip3 install -r requirements.txt && pytest .
+          python-version: "3.10"
+
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Pytest
+        run: pytest .
