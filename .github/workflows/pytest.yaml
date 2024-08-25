@@ -1,5 +1,5 @@
 name: PyTest
-on: 
+on:
   pull_request:
   push:
     branches:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: fast-pytest
         uses: fylein/python-pytest-github-action@v2
         with:
