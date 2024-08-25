@@ -19,7 +19,7 @@ url = "https://api.notion.com/v1/databases/{}/query".format(database_id)
 payload = {"page_size": 100}
 headers = {
     "Accept": "application/json",
-    "Notion-Version": "2022-02-22",
+    "Notion-Version": "2022-06-28",
     "Content-Type": "application/json",
     "Authorization": "Bearer {}".format(notion_token)
 }
