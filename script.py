@@ -1,7 +1,5 @@
 import os
 
-from dotenv import load_dotenv
-
 from utils.GitHubHelper import GitHubHelper, GraphQLHelper
 from utils.NotionHelper import NotionHelper
 
