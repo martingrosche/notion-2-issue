@@ -4,13 +4,14 @@
 [![Version: v1.0.0](https://img.shields.io/badge/Version-v1.0.0-green)](https://github.com/martingrosche/notion-2-issue/releases)
 [![GitHub Action: Marketplace](https://img.shields.io/badge/GitHub%20Action-Marketplace-blue?logo=github)](https://github.com/marketplace/actions/notion-2-issue)
 
-This GitHub action creates GitHub issues depending on a notion database.
+This GitHub action creates GitHub issues depending on a notion database and link them to there referenced project.
 
 ## Table Of Content
 
+- [Table Of Content](#table-of-content)
 - [Usage](#usage)
-- [Configuration](#configuration)
-- [Notion Database Template](#notio-database-template)
+- [Notion Database Template](#notion-database-template)
+- [Features](#features)
 - [Example Usage](#example-usage)
 - [Input Description](#input-description)
 - [Issues](#issues)
@@ -32,7 +33,14 @@ This GitHub action creates GitHub issues depending on a notion database.
 ## Notion Database Template
 
 Here is a [database template](https://plastic-giant-1e8.notion.site/0a57a7856cf9448e821583be3bcfa355?v=e3064104173f4d59990e9e072124e389) page for creating GitHub issues from a database. Switch to that page, duplicate it and test it.
-![GitHub_Issues_Template](docs/images/GitHub_Issues_Template.png)
+![GitHub_Issues_Template](docs/images/GitHub_Issues_Template_dark.png#gh-dark-mode-only)
+![GitHub_Issues_Template](docs/images/GitHub_Issues_Template_light.png#gh-light-mode-only)
+
+## Features
+
+- Create GitHub issues via notion database
+- Link created GitHub issue to the referenced project (*ProjectNumber*)
+  > To find the project number, look at the project URL. For example, https://github.com/orgs/octo-org/projects/5 has a project number of 5.
 
 ## Example Usage
 
@@ -55,9 +63,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Run Action
-        uses: martingrosche/notion-2-issue@v1.0.0
+        uses: martingrosche/notion-2-issue@v1.1.0
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
@@ -65,10 +73,10 @@ jobs:
 
 ## Input Description
 
-| Name             | Required | Default             | Description |
-| ---------------- | -------- | ------------------- | ----------- |
-| `notionToken`    | True     |                     | The Notion internal integration token. See [Usage](#usage) for more information. |
-| `notionDatabase` | True     |                     | The notion database ID. See [Usage](#usage) for more information. |
+| Name             | Required | Default             | Description                                                                                                                            |
+| ---------------- | -------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| `notionToken`    | True     |                     | The Notion internal integration token. See [Usage](#usage) for more information.                                                       |
+| `notionDatabase` | True     |                     | The notion database ID. See [Usage](#usage) for more information.                                                                      |
 | `githubToken`    | False    | ${{ github.token }} | [GITHUB_TOKEN](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) for authentication in a workflow run |
 
 ## Issues
