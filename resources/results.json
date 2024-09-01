@@ -19,6 +19,7 @@
             "database_id": "0815"
         },
         "archived": "False",
+        "in_trash": "False",
         "properties": {
             "Discription": {
                 "id": "DzDH",
@@ -47,6 +48,11 @@
                 "id": "0815",
                 "type": "multi_select",
                 "multi_select": []
+            },
+            "ProjectNumber": {
+                "id": "0815",
+                "type": "number",
+                "number": "None"
             },
             "Labels": {
                 "id": "0815",
@@ -83,7 +89,8 @@
                 ]
             }
         },
-        "url": "https://www.notion.so/Sample-Two-0815"
+        "url": "https://www.notion.so/Sample-Two-0815",
+        "public_url": "None"
     },
     {
         "object": "page",
@@ -140,6 +147,11 @@
                     }
                 ]
             },
+            "ProjectNumber": {
+                "id": "0815",
+                "type": "number",
+                "number": 1
+            },
             "Labels": {
                 "id": "0815",
                 "type": "multi_select",
@@ -175,6 +187,7 @@
                 ]
             }
         },
-        "url": "https://www.notion.so/Sample-One-0815"
+        "url": "https://www.notion.so/Sample-One-0815",
+        "public_url": "None"
     }
 ]
