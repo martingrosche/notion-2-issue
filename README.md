@@ -6,9 +6,6 @@
 
 This GitHub action creates GitHub issues depending on a notion database and link them to there referenced project.
 
-## Table Of Content
-
-- [Table Of Content](#table-of-content)
 - [Usage](#usage)
 - [Notion Database Template](#notion-database-template)
 - [Features](#features)
@@ -22,9 +19,9 @@ This GitHub action creates GitHub issues depending on a notion database and link
 1. Create a [new internal Notion integration](https://www.notion.so/my-integrations), give it a name (e.g. `github`) and note the value of the Internal Integration Token for further usage.
 2. Connect Notion Database to the name of the Integration Token. Open your Database -> `...` -> `Add Connection` (e.g. `github`).
 3. Note the `Database ID`.
-   > `https://www.notion.so/<long_hash_1>?v=<long_hash_2>`
-
-   The `long_hash_1` is the database ID and `<long_hash_2>` is the view ID.
+    > [!NOTE]  
+    > `https://www.notion.so/<long_hash_1>?v=<long_hash_2>`
+    > The `long_hash_1` is the database ID and `<long_hash_2>` is the view ID.
 4. In your GitHub repository, go to `Settings` -> `Secrets` -> `Actions`, and add a `New repository secret`.
    - Create a first secret and set the `Name` to `NOTION_TOKEN` and the `Value` to the Internal Integration Token you created in step 1.
    - Create a second one and set the name `Name` to `NOTION_DATABASE` and the `Value` to the `Database ID` described in Step 3.
@@ -38,8 +35,12 @@ Here is a [database template](https://plastic-giant-1e8.notion.site/0a57a7856cf9
 
 ## Features
 
-- Create GitHub issues via notion database
-- Link created GitHub issue to the referenced project (*ProjectNumber*)
+- Create GitHub issues via [Notion Database Template](#notion-database-template)
+- Link created GitHub issue to the [referenced project number](https://github.blog/changelog/2024-05-23-sunset-notice-projects-classic/)
+  > [!IMPORTANT]  
+  > Creation of new projects (classic) is [disabled](https://gh.io/projects-classic-sunset-notice). Therefore only [new projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) are supported!
+
+  > [!NOTE]  
   > To find the project number, look at the project URL. For example, https://github.com/orgs/octo-org/projects/5 has a project number of 5.
 
 ## Example Usage
@@ -65,7 +66,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Action
-        uses: martingrosche/notion-2-issue@v1.1.0
+        uses: martingrosche/notion-2-issue@v1.0.0
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
