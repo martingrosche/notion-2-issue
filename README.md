@@ -37,11 +37,12 @@ Here is a [database template](https://plastic-giant-1e8.notion.site/0a57a7856cf9
 
 1. Create GitHub issues via [Notion Database Template](#notion-database-template)
 2. Link created GitHub issue to the [referenced project number](https://github.blog/changelog/2024-05-23-sunset-notice-projects-classic/)
-  > [!IMPORTANT]  
-  > Creation of new projects (classic) is [disabled](https://gh.io/projects-classic-sunset-notice). Therefore only [new projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) are supported!
+    > [!IMPORTANT]  
+    > Creation of new projects (classic) is [disabled](https://gh.io/projects-classic-sunset-notice). Therefore only [new projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) are supported!
 
-  > [!NOTE]  
-  > To find the project number, look at the project URL. For example, https://github.com/orgs/octo-org/projects/5 has a project number of 5.
+    > [!NOTE]  
+    > To find the project number, look at the project URL. For example, https://github.com/orgs/octo-org/projects/5 has a project number of 5.
+3. Providing a list of created issue numbers as output variable.
 
 ## Example Usage
 
@@ -66,11 +67,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Action
-        uses: martingrosche/notion-2-issue@v1.0.0
+        id: notion_sync
+        uses: martingrosche/notion-2-issue@v1.1.0
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
           githubToken: ${{ secrets.PROJECT_TOKEN }}
+      - name: Print Issue Numbers
+        run: |
+          echo "The created issue numbers are ${{ steps.notion_sync.outputs.issueNumbers }}"
 ```
 
 ## Input Description
@@ -84,6 +89,12 @@ jobs:
   > [!NOTE]  
   > Using the linking feature it is necessary to **githubToken** with a TOKEN having full control of projects.
   > See [Managing your personal access tokens](https://docs.github.com/en/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) for more information.
+
+## Output Description
+
+| Name           | Description                         |
+| -------------- | ----------------------------------- |
+| `issueNumbers` | A list of the created issue numbers |
 
 ## Issues
 
