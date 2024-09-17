@@ -39,6 +39,7 @@ def sync_notion_to_github():
 
         if not gh_helper.repo.has_projects:
             print(f"Current repository isn't linked to a project.")
+            continue
 
         graphql_helper = GraphQLHelper(gh_token)
         prj = graphql_helper.query_prj(new_issue["project_number"]) or graphql_helper.query_prj(new_issue["project_number"], 'user')
