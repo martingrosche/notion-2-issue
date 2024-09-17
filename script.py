@@ -1,71 +1,56 @@
-
 import os
-from logging import warning
-from sqlite3 import DatabaseError
 
-import github
-import requests
-
+from utils.GitHubHelper import GitHubHelper, GraphQLHelper
 from utils.NotionHelper import NotionHelper
 
-# extracting all the input from environments
-notion_token = os.environ["INPUT_NOTIONTOKEN"]
-gh_token = os.environ["INPUT_GITHUBTOKEN"]
-database_id = os.environ["INPUT_NOTIONDATABASE"]
 
-# notion
-url = "https://api.notion.com/v1/databases/{}/query".format(database_id)
+def sync_notion_to_github():
+    # Extract input from environment
+    notion_token = os.environ["INPUT_NOTIONTOKEN"]
+    gh_token = os.environ["INPUT_GITHUBTOKEN"]
+    database_id = os.environ["INPUT_NOTIONDATABASE"]
+    repository = os.getenv("GITHUB_REPOSITORY")
 
-payload = {"page_size": 100}
-headers = {
-    "Accept": "application/json",
-    "Notion-Version": "2022-06-28",
-    "Content-Type": "application/json",
-    "Authorization": "Bearer {}".format(notion_token)
-}
+    if not all([notion_token, gh_token, database_id, repository]):
+        raise EnvironmentError("Missing required environment variables. Please check your .env file.")
 
-response = requests.post(url, json=payload, headers=headers)
-response_dict = response.json()
-notion_issues = response_dict["results"]
+    notion_helper = NotionHelper(notion_token, database_id)
+    issues = notion_helper.get_notion_issues()
 
-issues = []
-for i in reversed(notion_issues):
-    properties = i.get("properties")
-    if properties is None:
-        raise DatabaseError("'properties' not found.")
-    notionHelper = NotionHelper(properties)
-    title = notionHelper.get_title("Title") # page linked
-    if title == "":
-        warning("'Title' property must not be empty.")
-        continue
-    notion_issue = {}
-    notion_issue["title"] = title
+    gh_helper = GitHubHelper(gh_token, repository)
+    gh_issues = gh_helper.get_issues()
 
-    notion_issue["description"] = notionHelper.get_rich_text("Discription")
-    notion_issue["assignees"] = notionHelper.get_multi_select("Assignees")
-    notion_issue["labels"] = notionHelper.get_multi_select("Labels")
+    for new_issue in issues:
+        if list(filter(lambda i: i.title == new_issue["title"], gh_issues)):
+            print(f"Issue with the same title '{new_issue['title']}' already exists on GitHub.")
+            continue
+        
+        issue = gh_helper.create_issue(
+            new_issue["title"], 
+            new_issue["description"], 
+            new_issue["assignees"], 
+            new_issue["labels"]
+        )
+        if not issue:
+            continue
 
-    issues.append(notion_issue)
+        if not new_issue["project_number"]:
+            continue
 
-# github
-git = github.Github(gh_token)
-repo = git.get_repo(os.environ["GITHUB_REPOSITORY"])
-gh_issues = repo.get_issues()
+        if not gh_helper.repo.has_projects:
+            print(f"Current repository isn't linked to a project.")
+            continue
 
-for new_issue in issues:
-    # do not create issues with the same title
-    if list(filter(lambda i: i.title == new_issue["title"], gh_issues)):
-        print("Issue with the same title '{}' allready exists on github.".format(new_issue["title"]))
-        continue
+        graphql_helper = GraphQLHelper(gh_token)
+        prj = graphql_helper.query_prj(new_issue["project_number"]) or graphql_helper.query_prj(new_issue["project_number"], 'user')
 
-    issue = repo.create_issue(
-        title = new_issue["title"],
-        body = new_issue["description"],
-        assignees = new_issue["assignees"],
-        labels = new_issue["labels"]
-    )
-    if issue:
-        print("Create issue '{}'".format(new_issue["title"]))
-    else:
-        print("Failed to create issue '{}'".format(new_issue["title"]))
+        if not prj:
+            print(f"Cannot find a linked project with number {new_issue['project_number']}. Please link the correct project manually.")
+            continue
 
+        prj_item = graphql_helper.add_item_to_prj(prj['id'], issue.raw_data['node_id'])
+        if prj_item:
+            print(f"Issue '{issue.title}' added to project '{prj['title']}' successfully.")
+
+if __name__ == '__main__':
+    sync_notion_to_github()

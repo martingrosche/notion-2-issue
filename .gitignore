@@ -1,5 +1,9 @@
 # Python
+__pycache__
 **/*.pyc
 
 # vsCode
 .vscode/
+
+# environment
+*.env

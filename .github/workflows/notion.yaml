@@ -21,3 +21,4 @@ jobs:
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
+          githubToken: ${{ secrets.PROJECT_TOKEN }}
