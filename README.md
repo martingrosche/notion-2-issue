@@ -35,8 +35,8 @@ Here is a [database template](https://plastic-giant-1e8.notion.site/0a57a7856cf9
 
 ## Features
 
-- Create GitHub issues via [Notion Database Template](#notion-database-template)
-- Link created GitHub issue to the [referenced project number](https://github.blog/changelog/2024-05-23-sunset-notice-projects-classic/)
+1. Create GitHub issues via [Notion Database Template](#notion-database-template)
+2. Link created GitHub issue to the [referenced project number](https://github.blog/changelog/2024-05-23-sunset-notice-projects-classic/)
   > [!IMPORTANT]  
   > Creation of new projects (classic) is [disabled](https://gh.io/projects-classic-sunset-notice). Therefore only [new projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) are supported!
 
@@ -70,6 +70,7 @@ jobs:
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
+          githubToken: ${{ secrets.PROJECT_TOKEN }}
 ```
 
 ## Input Description
@@ -79,6 +80,10 @@ jobs:
 | `notionToken`    | True     |                     | The Notion internal integration token. See [Usage](#usage) for more information.                                                       |
 | `notionDatabase` | True     |                     | The notion database ID. See [Usage](#usage) for more information.                                                                      |
 | `githubToken`    | False    | ${{ github.token }} | [GITHUB_TOKEN](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) for authentication in a workflow run |
+
+  > [!NOTE]  
+  > Using the linking feature it is necessary to **githubToken** with a TOKEN having full control of projects.
+  > See [Managing your personal access tokens](https://docs.github.com/en/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) for more information.
 
 ## Issues
 
