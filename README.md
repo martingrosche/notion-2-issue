@@ -1,7 +1,7 @@
 # Notion 2 Issue
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-![GitHub Release](https://img.shields.io/github/v/release/martingrosche/notion-2-issue?display_name=release&logo=github&color=green)
+[![GitHub Release](https://img.shields.io/github/v/release/martingrosche/notion-2-issue?display_name=release&logo=github&color=green)](https://github.com/martingrosche/notion-2-issue/releases)
 [![GitHub Action: Marketplace](https://img.shields.io/badge/GitHub-Marketplace-blue?logo=githubactions)](https://github.com/marketplace/actions/notion-2-issue)
 
 Notion 2 Issue is a GitHub Action that automatically creates GitHub issues based on entries in a Notion database and links them to their referenced projects. This tool bridges the gap between Notion task management and GitHub issue tracking, streamlining your workflow.
