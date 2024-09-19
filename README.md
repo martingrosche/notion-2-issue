@@ -88,7 +88,7 @@ jobs:
 
       - name: Sync Notion to GitHub Issues
         id: notion_sync
-        uses: martingrosche/notion-2-issue@v1.1.0
+        uses: martingrosche/notion-2-issue@v1.2.0
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
