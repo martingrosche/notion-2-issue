@@ -14,10 +14,16 @@ class TestNotionToGitHubSync(unittest.TestCase):
         os.environ['INPUT_NOTIONDATABASE'] = 'fake_database_id'
         os.environ['GITHUB_REPOSITORY'] = 'fake_owner/fake_repo'
         os.environ['GITHUB_OUTPUT'] = 'github_output.txt'
+        os.environ['GITHUB_STEP_SUMMARY'] = 'github_step_summary.md'
 
     def tearDown(self):
-        if os.path.exists('github_output.txt'):
-            os.remove('github_output.txt')
+        for key in ['INPUT_NOTIONTOKEN', 'INPUT_GITHUBTOKEN', 'INPUT_NOTIONDATABASE', 'GITHUB_REPOSITORY', 'GITHUB_OUTPUT', 'GITHUB_STEP_SUMMARY']:
+            if key in os.environ:
+                del os.environ[key]
+        
+        for file in ['github_output.txt', 'github_step_summary.md']:
+            if os.path.exists(file):
+                os.remove(file)
 
     def capture_output(self):
         self.captured_output = io.StringIO()
@@ -51,6 +57,7 @@ class TestNotionToGitHubSync(unittest.TestCase):
 
         mock_github_helper = MockGitHubHelper.return_value
         mock_github_helper.get_issues.return_value = []
+        mock_github_helper.create_job_summary.return_value = "Fake summary"
         mock_repo = MagicMock()
         mock_github_helper.repo = mock_repo
         mock_repo.has_projects = True
@@ -79,6 +86,7 @@ class TestNotionToGitHubSync(unittest.TestCase):
         self.assertIn("Issue 'Test Issue 2' added to project 'Test Project' successfully.", output)
         
         mock_github_helper.get_issues.assert_called_once()
+        mock_github_helper.create_job_summary.assert_called_once()
         self.assertEqual(mock_github_helper.create_issue.call_count, 2)
         mock_github_helper.create_issue.assert_any_call(
             "Test Issue 1",
@@ -94,10 +102,19 @@ class TestNotionToGitHubSync(unittest.TestCase):
         )
         self.assertEqual(mock_graphql_helper.query_prj.call_count, 2)
         self.assertEqual(mock_graphql_helper.add_item_to_prj.call_count, 2)
+
+        self.assertTrue(os.path.exists('github_output.txt'), "github_output.txt file was not created")
+        self.assertTrue(os.path.exists('github_step_summary.md'), "github_step_summary.md file was not created")
         
         with open('github_output.txt', 'r') as f:
             github_output = f.read()
         self.assertEqual(github_output, "issueNumbers=[1, 2]")
+
+        mock_github_helper.create_job_summary.assert_called_once()
+        with open('github_step_summary.md', 'r') as f:
+            summary_output = f.read()
+        self.assertEqual(summary_output, "Fake summary")
+
 
     @patch('script.NotionHelper')
     @patch('script.GitHubHelper')
@@ -124,7 +141,10 @@ class TestNotionToGitHubSync(unittest.TestCase):
 
         self.assertIn("Issue with the same title 'Existing Issue' already exists on GitHub.", output)
         mock_github_helper.create_issue.assert_not_called()
-        self.assertFalse(os.path.exists('github_output.txt'))
+        mock_github_helper.create_job_summary.assert_called_once()
+        self.assertFalse(os.path.exists('github_output.txt'), "github_output.txt file was created")
+        self.assertTrue(os.path.exists('github_step_summary.md'), "github_step_summary.md file was not created")
+
 
     @patch('script.NotionHelper')
     @patch('script.GitHubHelper')
@@ -157,7 +177,11 @@ class TestNotionToGitHubSync(unittest.TestCase):
 
         self.assertIn("Current repository isn't linked to a project.", output)
         mock_github_helper.create_issue.assert_called_once()
+        mock_github_helper.create_job_summary.assert_called_once()
         
+        self.assertTrue(os.path.exists('github_output.txt'), "github_output.txt file was not created")
+        self.assertTrue(os.path.exists('github_step_summary.md'), "github_step_summary.md file was not created")
+
         with open('github_output.txt', 'r') as f:
             github_output = f.read()
         self.assertEqual(github_output, "issueNumbers=[1]")
@@ -196,6 +220,11 @@ class TestNotionToGitHubSync(unittest.TestCase):
 
         self.assertIn("Cannot find a linked project with number 999. Please link the correct project manually.", output)
         mock_github_helper.create_issue.assert_called_once()
+        mock_github_helper.create_job_summary.assert_called_once()
+
+        self.assertTrue(os.path.exists('github_output.txt'), "github_output.txt file was not created")
+        self.assertTrue(os.path.exists('github_step_summary.md'), "github_step_summary.md file was not created")
+
         
         with open('github_output.txt', 'r') as f:
             github_output = f.read()
