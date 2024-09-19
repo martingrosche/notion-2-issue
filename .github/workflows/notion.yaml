@@ -16,9 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       - name: Run Action
+        id: notion_sync
         uses: ./
         # pass user input as arguments
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
           githubToken: ${{ secrets.PROJECT_TOKEN }}
+      - name: Print Issue Numbers
+        run: |
+          echo "The created issue numbers are ${{ steps.notion_sync.outputs.issueNumbers }}"

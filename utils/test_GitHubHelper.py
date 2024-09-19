@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import Mock, mock_open, patch
 
 import pytest
 from github import GithubException
@@ -54,6 +54,53 @@ class TestGitHubHelper:
             assignees=["assignee1"],
             labels=["label1"]
         )
+    
+    def test_create_issue_success_with_summary(self, github_helper, mock_repo):
+        mock_issue = Mock(spec=Issue)
+        mock_issue.html_url = "https://github.com/test-org/test-repo/issues/1"
+        mock_repo.create_issue.return_value = mock_issue
+        
+        issue = github_helper.create_issue("Test Issue", "Test Body", ["assignee1"], ["label1"])
+        
+        assert issue == mock_issue
+        assert github_helper.summary_data == [("Test Issue", "https://github.com/test-org/test-repo/issues/1", True, False)]
+
+    def test_create_issue_failure_with_summary(self, github_helper, mock_repo):
+        mock_repo.create_issue.side_effect = GithubException(status=422, data={})
+        
+        issue = github_helper.create_issue("Test Issue", "Test Body")
+        
+        assert issue is None
+        assert github_helper.summary_data == [("Test Issue", "", False, False)]
+
+    def test_update_project_link_status(self, github_helper):
+        github_helper.summary_data = [("Test Issue", "https://github.com/test-org/test-repo/issues/1", True, False)]
+        
+        github_helper.update_project_link_status("Test Issue", True)
+        
+        assert github_helper.summary_data == [("Test Issue", "https://github.com/test-org/test-repo/issues/1", True, True)]
+
+    def test_create_job_summary(self, github_helper):
+        github_helper.summary_data = [
+            ("Test Issue 1", "https://github.com/test-org/test-repo/issues/1", True, True),
+            ("Test Issue 2", "https://github.com/test-org/test-repo/issues/2", True, False),
+            ("Test Issue 3", "", False, False)
+        ]
+        
+        summary = github_helper.create_job_summary()
+        
+        expected_lines = [
+            "# Notion to GitHub Sync Summary",
+            "| Notion Issue Title | Created | Project Linked |",
+            "|--------------------|---------|----------------|",
+            "| [Test Issue 1](https://github.com/test-org/test-repo/issues/1) | ✅ | ✅ |",
+            "| [Test Issue 2](https://github.com/test-org/test-repo/issues/2) | ✅ | ❌ |",
+            "| Test Issue 3 | ❌ | ❌ |"
+        ]
+        
+        for line in expected_lines:
+            assert line in summary, f"Expected line not found in summary: {line}"
+
 
     def test_create_issue_failure(self, github_helper, mock_repo):
         mock_repo.create_issue.side_effect = GithubException(status=422, data={})

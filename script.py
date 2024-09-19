@@ -20,9 +20,11 @@ def sync_notion_to_github():
     gh_helper = GitHubHelper(gh_token, repository)
     gh_issues = gh_helper.get_issues()
 
+    created_issue_numbers = []
     for new_issue in issues:
         if list(filter(lambda i: i.title == new_issue["title"], gh_issues)):
             print(f"Issue with the same title '{new_issue['title']}' already exists on GitHub.")
+            gh_helper.summary_data.append((new_issue['title'], "", False, False))
             continue
         
         issue = gh_helper.create_issue(
@@ -33,6 +35,8 @@ def sync_notion_to_github():
         )
         if not issue:
             continue
+
+        created_issue_numbers.append(issue.number)
 
         if not new_issue["project_number"]:
             continue
@@ -50,7 +54,15 @@ def sync_notion_to_github():
 
         prj_item = graphql_helper.add_item_to_prj(prj['id'], issue.raw_data['node_id'])
         if prj_item:
+            gh_helper.update_project_link_status(new_issue["title"], True)
             print(f"Issue '{issue.title}' added to project '{prj['title']}' successfully.")
+    
+    if created_issue_numbers:
+        with open(os.environ['GITHUB_OUTPUT'], 'a') as gh_out_file:
+            gh_out_file.write(f"issueNumbers={created_issue_numbers}")
+
+    with open(os.environ.get('GITHUB_STEP_SUMMARY', 'github_step_summary.md'), 'w') as summary_file:
+        summary_file.write(gh_helper.create_job_summary())
 
 if __name__ == '__main__':
     sync_notion_to_github()

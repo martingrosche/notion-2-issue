@@ -11,11 +11,12 @@ inputs:
     description: 'Your GitHub personal access token with project rights'
     required: false
     default: ${{ github.token }}
-
+outputs:
+  issueNumbers:
+    description: 'A list of the created issue numbers'
 runs:
   using: docker
   image: 'Dockerfile'
-
 branding: 
   icon: refresh-ccw
   color: purple

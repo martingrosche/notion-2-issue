@@ -1,94 +1,143 @@
 # Notion 2 Issue
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
-[![Version: v1.0.0](https://img.shields.io/badge/Version-v1.0.0-green)](https://github.com/martingrosche/notion-2-issue/releases)
-[![GitHub Action: Marketplace](https://img.shields.io/badge/GitHub%20Action-Marketplace-blue?logo=github)](https://github.com/marketplace/actions/notion-2-issue)
+[![GitHub Release](https://img.shields.io/github/v/release/martingrosche/notion-2-issue?display_name=release&logo=github&color=green)](https://github.com/martingrosche/notion-2-issue/releases)
+[![GitHub Action: Marketplace](https://img.shields.io/badge/GitHub-Marketplace-blue?logo=githubactions)](https://github.com/marketplace/actions/notion-2-issue)
 
-This GitHub action creates GitHub issues depending on a notion database and link them to there referenced project.
+Notion 2 Issue is a GitHub Action that automatically creates GitHub issues based on entries in a Notion database and links them to their referenced projects. This tool bridges the gap between Notion task management and GitHub issue tracking, streamlining your workflow.
 
-- [Usage](#usage)
-- [Notion Database Template](#notion-database-template)
+## Table of Contents
+
 - [Features](#features)
-- [Example Usage](#example-usage)
-- [Input Description](#input-description)
+- [Setup](#setup)
+  - [Notion Setup](#notion-setup)
+  - [GitHub Setup](#github-setup)
+- [Notion Database Template](#notion-database-template)
+- [Usage](#usage)
+- [Example Workflow](#example-workflow)
+- [Input Parameters](#input-parameters)
+- [Output](#output)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
 - [Issues](#issues)
 - [License](#license)
 
-## Usage
+## Features
 
-1. Create a [new internal Notion integration](https://www.notion.so/my-integrations), give it a name (e.g. `github`) and note the value of the Internal Integration Token for further usage.
-2. Connect Notion Database to the name of the Integration Token. Open your Database -> `...` -> `Add Connection` (e.g. `github`).
-3. Note the `Database ID`.
-    > [!NOTE]  
-    > `https://www.notion.so/<long_hash_1>?v=<long_hash_2>`
-    > The `long_hash_1` is the database ID and `<long_hash_2>` is the view ID.
-4. In your GitHub repository, go to `Settings` -> `Secrets` -> `Actions`, and add a `New repository secret`.
-   - Create a first secret and set the `Name` to `NOTION_TOKEN` and the `Value` to the Internal Integration Token you created in step 1.
-   - Create a second one and set the name `Name` to `NOTION_DATABASE` and the `Value` to the `Database ID` described in Step 3.
-5. [Encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) are recommended.
+1. **Automated Issue Creation**: Generate GitHub issues directly from Notion database entries.
+2. **Project Integration**: Automatically link created issues to referenced GitHub projects.
+3. **Output Tracking**: Provides a list of created issue numbers for further automation or tracking.
+4. **Job Summary**: Displays a summary of the action's results for quick review.
+
+## Setup
+
+### Notion Setup
+
+1. Create a [new internal Notion integration](https://www.notion.so/my-integrations):
+   - Give it a name (e.g., `github`)
+   - Note the Internal Integration Token for later use
+
+2. Connect your Notion Database to the integration:
+   - Open your Database → `...` → `Add Connection` → Select your integration
+
+3. Note the `Database ID`:
+   - In the database URL: `https://www.notion.so/<DATABASE_ID>?v=<VIEW_ID>`
+   - The `<DATABASE_ID>` is what you need
+
+### GitHub Setup
+
+1. In your GitHub repository, go to `Settings` → `Secrets` → `Actions`
+2. Add two new repository secrets:
+   - `NOTION_TOKEN`: Set to your Notion Internal Integration Token
+   - `NOTION_DATABASE`: Set to your Notion Database ID
 
 ## Notion Database Template
 
-Here is a [database template](https://plastic-giant-1e8.notion.site/0a57a7856cf9448e821583be3bcfa355?v=e3064104173f4d59990e9e072124e389) page for creating GitHub issues from a database. Switch to that page, duplicate it and test it.
-![GitHub_Issues_Template](docs/images/GitHub_Issues_Template_dark.png#gh-dark-mode-only)
-![GitHub_Issues_Template](docs/images/GitHub_Issues_Template_light.png#gh-light-mode-only)
+Use the [provided template](https://plastic-giant-1e8.notion.site/0a57a7856cf9448e821583be3bcfa355?v=e3064104173f4d59990e9e072124e389) to set up your Notion database for GitHub issue creation. Duplicate the template to get started quickly.
 
-## Features
+![Notion Database Template](docs/images/GitHub_Issues_Template_dark.png#gh-dark-mode-only)
+![Notion Database Template](docs/images/GitHub_Issues_Template_light.png#gh-light-mode-only)
 
-1. Create GitHub issues via [Notion Database Template](#notion-database-template)
-2. Link created GitHub issue to the [referenced project number](https://github.blog/changelog/2024-05-23-sunset-notice-projects-classic/)
-  > [!IMPORTANT]  
-  > Creation of new projects (classic) is [disabled](https://gh.io/projects-classic-sunset-notice). Therefore only [new projects](https://docs.github.com/en/issues/planning-and-tracking-with-projects/learning-about-projects/about-projects) are supported!
+## Usage
 
-  > [!NOTE]  
-  > To find the project number, look at the project URL. For example, https://github.com/orgs/octo-org/projects/5 has a project number of 5.
+1. Set up your Notion database and GitHub secrets as described in the [Setup](#setup) section.
+2. Create a GitHub Actions workflow file (e.g., `.github/workflows/notion-sync.yml`) in your repository.
+3. Configure the workflow to use the `martingrosche/notion-2-issue` action (see [Example Workflow](#example-workflow)).
+4. Commit and push the workflow file to trigger the action.
 
-## Example Usage
-
-The following example demonstrates a GitHub action that runs on a schedule or is triggered manually and sets the `Read and write permissions` only for this one. To set this permission globally go to `Settings` -> `Actions` -> `General` -> `Workflow permissions` -> `Read and write permissions` -> `Save`. Make sure your repo can run actions `Settings` -> `Actions` -> `General` -> `Actions Permission` -> `Allow all actions and reusable workflows` -> `Save`.
+## Example Workflow
 
 ```yaml
-name: Notion Database
+name: Notion to GitHub Issues Sync
 on: 
-  # run action manually
-  workflow_dispatch:
-  # run every night at midnight 
+  workflow_dispatch:  # Allows manual triggering
   schedule:
-    - cron: '0 0 * * *'
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+
 permissions:
   contents: read
   repository-projects: read
   issues: write
+
 jobs:
-  sync-github-issues:
+  sync-notion-to-github:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Run Action
-        uses: martingrosche/notion-2-issue@v1.0.0
+
+      - name: Sync Notion to GitHub Issues
+        id: notion_sync
+        uses: martingrosche/notion-2-issue@v1.2.0
         with:
           notionToken: ${{ secrets.NOTION_TOKEN }}
           notionDatabase: ${{ secrets.NOTION_DATABASE }}
           githubToken: ${{ secrets.PROJECT_TOKEN }}
+
+      - name: Print Created Issue Numbers
+        run: echo "Created issue numbers: ${{ steps.notion_sync.outputs.issueNumbers }}"
 ```
 
-## Input Description
+## Input Parameters
 
-| Name             | Required | Default             | Description                                                                                                                            |
-| ---------------- | -------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| `notionToken`    | True     |                     | The Notion internal integration token. See [Usage](#usage) for more information.                                                       |
-| `notionDatabase` | True     |                     | The notion database ID. See [Usage](#usage) for more information.                                                                      |
-| `githubToken`    | False    | ${{ github.token }} | [GITHUB_TOKEN](https://docs.github.com/en/actions/security-guides/automatic-token-authentication) for authentication in a workflow run |
+| Name             | Required | Default               | Description                       |
+| ---------------- | -------- | --------------------- | --------------------------------- |
+| `notionToken`    | Yes      |                       | Notion internal integration token |
+| `notionDatabase` | Yes      |                       | Notion database ID                |
+| `githubToken`    | No       | `${{ github.token }}` | GitHub token for authentication   |
 
-  > [!NOTE]  
-  > Using the linking feature it is necessary to **githubToken** with a TOKEN having full control of projects.
-  > See [Managing your personal access tokens](https://docs.github.com/en/enterprise-cloud@latest/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) for more information.
+> **Note**: For project linking, use a `githubToken` with full control of projects. See [Managing your personal access tokens](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens) for more information.
+
+## Output
+
+| Name           | Description                         |
+| -------------- | ----------------------------------- |
+| `issueNumbers` | A list of the created issue numbers |
+
+## Troubleshooting
+
+- **Issues not being created**: Ensure your Notion token has the correct permissions and the database ID is correct.
+- **Project linking fails**: Verify that your GitHub token has sufficient permissions to access and modify projects.
+- **Workflow doesn't run**: Check that Actions are enabled for your repository and the workflow file is in the correct location.
+
+For more detailed troubleshooting, check the Action logs in your GitHub repository.
+
+## Contributing
+
+Contributions are welcome! If you'd like to contribute:
+
+1. Fork the repository
+2. Create a new branch for your feature
+3. Commit your changes
+4. Push to your branch
+5. Create a new Pull Request
+
+Please ensure your code adheres to the existing style and all tests pass before submitting a PR.
 
 ## Issues
 
-To report a bug or request an enhancement to this plugin please raise a new [GitHub issue](https://github.com/martingrosche/notion-2-issue/issues/new/choose).
+To report a bug or request an enhancement, please [open a new GitHub issue](https://github.com/martingrosche/notion-2-issue/issues/new/choose).
 
 ## License
 
-This project is licensed under the terms of the [MIT license](./LICENSE) @[martingrosche](https://github.com/martingrosche).
+This project is licensed under the [MIT License](./LICENSE) © [martingrosche](https://github.com/martingrosche).

@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
 
 import github
 import requests
@@ -12,6 +12,7 @@ class GitHubHelper:
         self.git = github.Github(auth_token)
         self.repo = self.git.get_repo(repo_name)
         self.org, self.project = self.repo.full_name.split('/')
+        self.summary_data: List[Tuple[str, str, bool, bool]] = []
 
     def get_issues(self) -> PaginatedList[Issue]:
         return self.repo.get_issues()
@@ -31,10 +32,31 @@ class GitHubHelper:
                 labels=labels
             )
             print(f"Created issue '{title}'.")
+            self.summary_data.append((title, issue.html_url, True, False))
             return issue
         except github.GithubException as e:
             print(f"Failed to create issue '{title}'. Error: {str(e)}")
+            self.summary_data.append((title, "", False, False))
             return None
+
+    def update_project_link_status(self, title: str, linked: bool):
+        for i, (t, url, created, _) in enumerate(self.summary_data):
+            if t == title:
+                self.summary_data[i] = (t, url, created, linked)
+                break
+
+    def create_job_summary(self) -> str:
+        summary = "# Notion to GitHub Sync Summary\n\n"
+        summary += "| Notion Issue Title | Created | Project Linked |\n"
+        summary += "|--------------------|---------|----------------|\n"
+
+        for title, url, created, linked in self.summary_data:
+            created_emoji = "✅" if created else "❌"
+            linked_emoji = "✅" if linked else "❌"
+            issue_link = f"[{title}]({url})" if url else f"{title}"
+            summary += f"| {issue_link} | {created_emoji} | {linked_emoji} |\n"
+        
+        return summary
 
 
 class GraphQLHelper:
