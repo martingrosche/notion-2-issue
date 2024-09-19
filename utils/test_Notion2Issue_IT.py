@@ -134,6 +134,7 @@ class TestNotionToGitHubSync(unittest.TestCase):
         existing_issue = MagicMock()
         existing_issue.title = "Existing Issue"
         mock_github_helper.get_issues.return_value = [existing_issue]
+        mock_github_helper.create_job_summary.return_value = "Fake summary"
 
         self.capture_output()
         sync_notion_to_github()
@@ -170,6 +171,7 @@ class TestNotionToGitHubSync(unittest.TestCase):
         mock_issue.title = "Test Issue"
         mock_issue.number = 1
         mock_github_helper.create_issue.return_value = mock_issue
+        mock_github_helper.create_job_summary.return_value = "Fake summary"
 
         self.capture_output()
         sync_notion_to_github()
@@ -210,6 +212,7 @@ class TestNotionToGitHubSync(unittest.TestCase):
         mock_issue.title = "Test Issue"
         mock_issue.number = 1
         mock_github_helper.create_issue.return_value = mock_issue
+        mock_github_helper.create_job_summary.return_value = "Fake summary"
 
         mock_graphql_helper = MockGraphQLHelper.return_value
         mock_graphql_helper.query_prj.return_value = None

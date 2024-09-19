@@ -24,6 +24,7 @@ def sync_notion_to_github():
     for new_issue in issues:
         if list(filter(lambda i: i.title == new_issue["title"], gh_issues)):
             print(f"Issue with the same title '{new_issue['title']}' already exists on GitHub.")
+            gh_helper.summary_data.append((new_issue['title'], "", False, False))
             continue
         
         issue = gh_helper.create_issue(
@@ -61,7 +62,7 @@ def sync_notion_to_github():
             gh_out_file.write(f"issueNumbers={created_issue_numbers}")
 
     with open(os.environ.get('GITHUB_STEP_SUMMARY', 'github_step_summary.md'), 'w') as summary_file:
-        summary_file.write(f"{gh_helper.create_job_summary()}")
+        summary_file.write(gh_helper.create_job_summary())
 
 if __name__ == '__main__':
     sync_notion_to_github()
